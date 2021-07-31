@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BusStop", "BusStop\BusStop.vcxproj", "{DC2329A0-4853-4988-B0D3-9E6C03CEC114}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC2329A0-4853-4988-B0D3-9E6C03CEC114}.Debug|x64.ActiveCfg = Debug|x64
+		{DC2329A0-4853-4988-B0D3-9E6C03CEC114}.Debug|x64.Build.0 = Debug|x64
+		{DC2329A0-4853-4988-B0D3-9E6C03CEC114}.Debug|x86.ActiveCfg = Debug|Win32
+		{DC2329A0-4853-4988-B0D3-9E6C03CEC114}.Debug|x86.Build.0 = Debug|Win32
+		{DC2329A0-4853-4988-B0D3-9E6C03CEC114}.Release|x64.ActiveCfg = Release|x64
+		{DC2329A0-4853-4988-B0D3-9E6C03CEC114}.Release|x64.Build.0 = Release|x64
+		{DC2329A0-4853-4988-B0D3-9E6C03CEC114}.Release|x86.ActiveCfg = Release|Win32
+		{DC2329A0-4853-4988-B0D3-9E6C03CEC114}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {285E9A05-03E6-4BCB-AE64-EB8C8B6558A3}
+	EndGlobalSection
+EndGlobal
