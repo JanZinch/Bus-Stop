@@ -1,44 +1,36 @@
 ﻿#include <iostream>
 #include <fstream>
 #include <string>
-
-#include<vector>
+#include <vector>
 #include <list>
-//#include <debugapi.h>
 
 #include "Service.h"
-
-
-
 
 using namespace std;
 
 
-
 bool first_condition(const list<TravelService>::iterator &it, TravelService &current) {
 
-	return it->GetDepature() == current.GetDepature() && it->GetArrival() > current.GetArrival();
+	return it->depature() == current.depature() && it->arrival() > current.arrival();
 }
 
 bool second_condition(const list<TravelService>::iterator &it, TravelService &current) {
 
-	return it->GetArrival() == current.GetArrival() && it->GetDepature() < current.GetDepature();
+	return it->arrival() == current.arrival() && it->depature() < current.depature();
 }
 
 bool third_condition(const list<TravelService>::iterator &it, TravelService &current) {
 
-	return it->GetDepature() < current.GetDepature() && it->GetArrival() > current.GetArrival();
+	return it->depature() < current.depature() && it->arrival() > current.arrival();
 }
 
 bool fourth_condition(const list<TravelService>::iterator &it, TravelService &current) {
 
-	return it->GetDepature() == current.GetDepature() && it->GetArrival() == current.GetArrival() && it->GetCompany() == GROTTY;
+	return it->depature() == current.depature() && it->arrival() == current.arrival() && it->company() == GROTTY && current.company() == POSH;
 }
 
 
-
-
-void CheckForEfficient(list<TravelService>& timetable) {
+void checkForEfficient(list<TravelService>& timetable) {
 
 	int i, j = 0;
 
@@ -49,56 +41,24 @@ void CheckForEfficient(list<TravelService>& timetable) {
 		selected_values_mask[i] = false;
 	}
 	
-	TravelService current;
-	auto i_iter = timetable.begin(), j_iter = timetable.begin();
+	TravelService selected_entry;
+	list<TravelService>::iterator i_iter, j_iter;
+	i_iter = j_iter = timetable.begin();
 
 	for (i = 0; i < timetable.size(); i++) {
 
-		current = TravelService(POSH, i_iter->GetDepature(), i_iter->GetArrival());
-		//i_iter++;
-
+		selected_entry = TravelService(i_iter->company(), i_iter->depature(), i_iter->arrival());
 		j = 0;
 
 		for (j_iter = timetable.begin(); j_iter != timetable.end(); j_iter++) {
 
 			if (j_iter == i_iter) { j++; continue; }
 
-			if (first_condition(j_iter, current) || second_condition(j_iter, current)
-				|| third_condition(j_iter, current) || fourth_condition(j_iter, current)) {
+			if (first_condition(j_iter, selected_entry) || second_condition(j_iter, selected_entry) || third_condition(j_iter, selected_entry) 
+				|| fourth_condition(j_iter, selected_entry)) {
 			
-				selected_values_mask[j] = true;
-			
+				selected_values_mask[j] = true;		
 			}
-
-
-			//if ((*j_iter).GetDepature() == current.GetDepature()
-			//	&& (*j_iter).GetArrival() > current.GetArrival()) {
-
-			//	//cout << (*j_iter).second.GetArrival().ToString() << " > " << current.ToString() << endl;
-
-			//	selected_values_mask[j] = true;
-			//}
-
-			//if ((*j_iter).GetArrival() == current.GetArrival()
-			//	&& (*j_iter).GetDepature() < current.GetDepature()) {
-
-			//	selected_values_mask[j] = true;
-			//}
-
-			//if ((*j_iter).GetDepature() < current.GetDepature()
-			//	&& (*j_iter).GetArrival() > current.GetArrival()) {
-
-
-			//	selected_values_mask[j] = true;
-
-			//}
-
-			//if ((*j_iter).GetDepature() == current.GetDepature()
-			//	&& (*j_iter).GetArrival() == current.GetArrival() && (*j_iter).GetCompany() == Company::GROTTY) {
-
-			//	selected_values_mask[j] = true;
-
-			//}
 
 			j++;
 		}
@@ -120,19 +80,35 @@ void CheckForEfficient(list<TravelService>& timetable) {
 	}
 
 	delete[] selected_values_mask;
+		
+}
+
+bool compareCompanies(TravelService left, TravelService right) {
+
+	return left.company() == POSH && right.company() == GROTTY;
+}
+
+void consolePrint(list<TravelService> &timetable) {
+
+	cout << " - - - " << endl;
+	for (auto var : timetable)
+	{
+		cout << var << endl;
+	}
+	cout << " - - - " << endl;
 }
 
 
 int main()
 {
 
-	const string original_timetable_path = "OriginalTimetableTest.txt";
+	const string original_timetable_path = "OriginalTimetable.txt";
 	const string resulting_timetable_path = "ResultingTimetable.txt";
 
 	list<TravelService> timetable;
 
-	ifstream file;
-	file.open(original_timetable_path);
+	fstream file;
+	file.open(original_timetable_path, fstream::in);
 
 	try {
 	
@@ -143,56 +119,57 @@ int main()
 		}
 		else
 		{
-			string company, depature, arrival = "";
+			TravelService buffer;
 
 			while (!file.eof()) {
 
-				file >> company;
-				file >> depature;
-				file >> arrival;
+				file >> buffer;
 
-				if (company == "") break;
-
-				if (company != GROTTY && company != POSH) {
-
+				if (buffer.company() != GROTTY && buffer.company() != POSH) {
+				
 					throw exception(BAD_DATA);
 				}
 
-				timetable.emplace_back(TravelService(company, HMTime(depature), HMTime(arrival)));
-				company = "";
+				timetable.emplace_back(buffer);
 			}
 
+			file.close();
 
-			for (auto it : timetable)
-			{
-				cout << it << endl;
-			}
-			cout << " - - - " << endl;
+			consolePrint(timetable);
 
-			timetable.sort();
+			timetable.unique();
+			timetable.remove_if([](TravelService value) { return value > ONE_HOUR; });			
+			timetable.sort();			
 
-			for (auto it : timetable)
-			{
-				cout << it << endl;
-			}
-			cout << " - - - " << endl;
+			checkForEfficient(timetable);	
+			timetable.sort(compareCompanies);
 
-			timetable.remove_if([](TravelService value) { return value > ONE_HOUR; });
-
-			for (auto it : timetable)
-			{
-				cout << it << endl;
-			}
-			cout << " - - - " << endl;
-
-			CheckForEfficient(timetable);
-
-			for (auto it : timetable)
-			{
-				cout << it << endl;
-			}
-			cout << " - - - " << endl;
+			consolePrint(timetable);
 		
+			file.open(resulting_timetable_path, fstream::out, fstream::trunc);
+
+			if (!file.is_open()) {
+
+				cout << "File " + resulting_timetable_path + " is not found!";
+				exit(EXIT_FAILURE);
+			}
+			else {
+			
+				bool blank_line_setted = false;
+
+				for (TravelService var : timetable)
+				{
+					if (!blank_line_setted && var.company() == GROTTY) { 
+						
+						file << endl;
+						blank_line_setted = true;						
+					}
+
+					file << var << endl;
+				}
+			
+				file.close();			
+			}	
 		}
 	
 		exit(EXIT_SUCCESS);
@@ -201,7 +178,13 @@ int main()
 	catch (exception ex) {
 	
 		cout << ex.what() << endl;
+		file.close();
 		exit(EXIT_FAILURE);	
+	}
+	catch (...) {
+	
+		file.close();
+		exit(EXIT_FAILURE);
 	}
 	
 
