@@ -9,7 +9,7 @@
 using namespace std;
 
 
-bool first_condition(const list<TravelService>::iterator &it, TravelService &current) {
+bool first_condition(const list<TravelService>::iterator &it, TravelService &current) {   
 
 	return it->depature() == current.depature() && it->arrival() > current.arrival();
 }
@@ -21,66 +21,56 @@ bool second_condition(const list<TravelService>::iterator &it, TravelService &cu
 
 bool third_condition(const list<TravelService>::iterator &it, TravelService &current) {
 
-	return it->depature() < current.depature() && it->arrival() > current.arrival();
+	if (it->midnightСrossing() && !current.midnightСrossing() || !it->midnightСrossing() && current.midnightСrossing()) {
+	
+		return it->depature() > current.depature() && it->arrival() > current.arrival();
+	}
+	else {
+	
+		return it->depature() < current.depature() && it->arrival() > current.arrival();	
+	}	
 }
 
-bool fourth_condition(const list<TravelService>::iterator &it, TravelService &current) {
+bool fourth_condition(const list<TravelService>::iterator &it, TravelService &current) {			
 
 	return it->depature() == current.depature() && it->arrival() == current.arrival() && it->company() == GROTTY && current.company() == POSH;
 }
 
 
 void checkForEfficient(list<TravelService>& timetable) {
-
-	int i, j = 0;
-
-	bool* selected_values_mask = new bool[timetable.size()];
-	
-	for (i = 0; i < timetable.size(); i++) {
-	
-		selected_values_mask[i] = false;
-	}
 	
 	TravelService selected_entry;
 	list<TravelService>::iterator i_iter, j_iter;
 	i_iter = j_iter = timetable.begin();
 
-	for (i = 0; i < timetable.size(); i++) {
+	for (int i = 0; i < timetable.size(); i++) {
 
 		selected_entry = TravelService(i_iter->company(), i_iter->depature(), i_iter->arrival());
-		j = 0;
 
-		for (j_iter = timetable.begin(); j_iter != timetable.end(); j_iter++) {
+		for (j_iter = timetable.begin(); j_iter != timetable.end(); j_iter++) {		
 
-			if (j_iter == i_iter) { j++; continue; }
-
-			if (first_condition(j_iter, selected_entry) || second_condition(j_iter, selected_entry) || third_condition(j_iter, selected_entry) 
+			if (j_iter == i_iter) continue;
+		
+			if (first_condition(j_iter, selected_entry) || second_condition(j_iter, selected_entry) || third_condition(j_iter, selected_entry)
 				|| fourth_condition(j_iter, selected_entry)) {
-			
-				selected_values_mask[j] = true;		
-			}
 
-			j++;
+				j_iter->Select();
+			}
 		}
 
 		++i_iter;
 	}
 
 	i_iter = timetable.begin();
-	i = 0;
 
 	while (i_iter != timetable.end()) {
 	
-		if (selected_values_mask[i]) {
+		if (i_iter->isSelected()) {
 		
 			i_iter = timetable.erase(i_iter);
-			i++;
 		}
-		else { ++i_iter; i++; }
-	}
-
-	delete[] selected_values_mask;
-		
+		else  ++i_iter; 
+	}		
 }
 
 bool compareCompanies(TravelService left, TravelService right) {
@@ -101,7 +91,6 @@ void consolePrint(list<TravelService> &timetable) {
 
 int main()
 {
-
 	const string original_timetable_path = "OriginalTimetable.txt";
 	const string resulting_timetable_path = "ResultingTimetable.txt";
 
@@ -140,6 +129,8 @@ int main()
 			timetable.unique();
 			timetable.remove_if([](TravelService value) { return value > ONE_HOUR; });			
 			timetable.sort();			
+
+			consolePrint(timetable);
 
 			checkForEfficient(timetable);	
 			timetable.sort(compareCompanies);
